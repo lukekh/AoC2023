@@ -5,7 +5,7 @@ import os
 import sys
 import shutil
 import re
-from scrape import scrape, ScrapeError
+from scrape import scrape, EarlyError, RequestError
 
 
 def main(day=None):
@@ -25,6 +25,16 @@ def main(day=None):
     else:
         n = day
 
+    try:
+        puzzle_inputs = scrape(n)
+    except RequestError as err:
+        print(f"Something wrong with request: {err}.")
+        return 1
+    except EarlyError:
+        print(f"You're too early for day {n} inputs")
+        print("exiting...")
+        return 0
+
     s = 'Day' + str(n).zfill(2)
 
     # Copy Template folder
@@ -42,10 +52,12 @@ def main(day=None):
     for file in os.listdir(folder):
         os.rename(folder+file, folder+file.replace('DayXX', s))
 
-    try:
-        scrape(n)
-    except ScrapeError:
-        print("Try scraping closer to puzzle release.")
+    print(f'Writing inputs to {s}/{s}.in')
+    with open(f"{s}/{s}.in", 'w', encoding="utf8") as f:
+        f.write(puzzle_inputs)
+
+    print("Happy puzzling!\n"+ '*'*23)
+
 
 if __name__ == "__main__":
     # If an argument is passed to script, run for that day else do next day from max

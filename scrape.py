@@ -1,23 +1,24 @@
 """Get puzzle inputs"""
-import time
 import datetime
 import sys
+import time
 import requests
 import credentials
 
-class ScrapeError(Exception):
-    """Error class for scraping error"""
+class RequestError(Exception):
+    """Problem with request"""
+
+class EarlyError(Exception):
+    """You're too keen, apparently"""
 
 
 def scrape(n):
     """
     Scrape AoC website for inputs
     """
-    s = 'Day' + str(n).zfill(2)
+    uri = f'https://adventofcode.com/2023/day/{n}/input'
 
-    uri = f'https://adventofcode.com/2022/day/{n}/input'
-
-    d = datetime.datetime(2022, 12, n, 15, 30, 0)
+    d = datetime.datetime(2023, 12, n, 15, 30, 0)
     delta = time.mktime(d.timetuple()) - time.time()
 
     if delta < 61:
@@ -28,15 +29,14 @@ def scrape(n):
 
         print('Getting inputs')
         with requests.Session() as r:
-            response = r.get(uri, cookies=credentials.SESSION_COOKIE, timeout=5).text
+            response = r.get(uri, cookies=credentials.credentials, timeout=5)
 
-        print(f'Writing to {s}/{s}.in')
-        with open(f"{s}/{s}.in", 'w', encoding="utf8") as f:
-            f.write(response)
-
-        print("Happy puzzling!\n"+ '*'*23)
+        if response.status_code == 200:
+            return response.text
+        else:
+            raise RequestError(f"Got status={response.status_code}, reason={response.reason}")
     else:
-        raise ScrapeError("You are running this too early.")
+        raise EarlyError("You are running this too early.")
 
 if __name__ == "__main__":
     # If an argument is passed to script, run for that day else do next day from max

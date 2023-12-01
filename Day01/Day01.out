@@ -1,0 +1,8 @@
+:: Advent of Code 2023 -- Day 1 ::
+:: Part One ::
+Answer: 54450
+runtime:  0.0006s
+:: Part Two ::
+Answer: 54265
+runtime:  0.0029s
+:: total runtime:  0.0035s ::

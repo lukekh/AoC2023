@@ -17,7 +17,6 @@ def part_one(args):
     ns = []
     for arg in args:
         ds = pattern.findall(arg)
-        # if len(ds) > 1:
         n = int(ds[0] + ds[-1])
         ns.append(n)
     return sum(ns)

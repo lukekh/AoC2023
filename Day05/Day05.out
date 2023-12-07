@@ -1,0 +1,8 @@
+:: Advent of Code 2023 -- Day 5 ::
+:: Part One ::
+Answer: 600279879
+runtime:  0.0004s
+:: Part Two ::
+Answer: 20191102
+runtime:  0.0025s
+:: total runtime:  0.0029s ::

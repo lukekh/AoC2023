@@ -1,0 +1,8 @@
+:: Advent of Code 2023 -- Day 7 ::
+:: Part One ::
+Answer: 250254244
+runtime:  0.0069s
+:: Part Two ::
+Answer: 250087440
+runtime:  0.0131s
+:: total runtime:  0.0199s ::

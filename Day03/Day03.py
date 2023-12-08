@@ -1,7 +1,6 @@
 """AoC :: Day 3"""
 from dataclasses import dataclass
 import time
-import re
 from typing import Set, Tuple
 day = 3
 
@@ -38,27 +37,26 @@ class Symbol:
     def __hash__(self):
         return hash((self.char, self.row, self.col, "Symbol"))
 
-re_number = re.compile(r"^\d+")
-DIGITS = [str(i) for i in range(10)]
-re_symbol = re.compile(r"^[^\d\.]")
+# Don't need to construct this more than once
+DIGITS = {str(i) for i in range(10)}
 
 def parse(s: str, row: int):
     """parse inputs"""
-    numbers = []
-    symbols = []
+    numbers = set()
+    symbols = set()
     acc = ""
 
     for i, char in enumerate(s):
         if char in (".", "\n"):
             if acc:
-                numbers.append(Number(int(acc), row, i-len(acc), i-1))
+                numbers.add(Number(int(acc), row, i-len(acc), i-1))
             acc = ""
         elif char in DIGITS:
             acc += char
         else:
             if acc:
-                numbers.append(Number(int(acc), row, i-len(acc), i-1))
-            symbols.append(Symbol(char, row, i))
+                numbers.add(Number(int(acc), row, i-len(acc), i-1))
+            symbols.add(Symbol(char, row, i))
             acc = ""
     return set(numbers), set(symbols)
 

@@ -11,15 +11,15 @@ with open('Day01/Day01.in', encoding="utf8") as f:
 
 
 # part one
-def part_one(args):
+def part_one(args: List[str]):
     """Solution to part one"""
     pattern = re.compile(r"\d")
-    ns = []
-    for arg in args:
-        ds = pattern.findall(arg)
-        n = int(ds[0] + ds[-1])
-        ns.append(n)
-    return sum(ns)
+
+    def first_and_last(s: str):
+        first, last = pattern.search(s).group(0), pattern.search(s[::-1]).group(0)
+        return int(first + last)
+
+    return sum(first_and_last(arg) for arg in args)
 
 # part two
 def part_two(args: List[str]):
@@ -38,16 +38,13 @@ def part_two(args: List[str]):
     }
     word_digits = "|".join(mapping.keys())
     pattern = re.compile(fr"{word_digits}|\d")
-    ns = []
-    for arg in args:
-        # Some numbers look like "oneight" and both count as occurrences of "one" and "eight"
-        # This can be fixed by just finding all the instances of "one" and replacing them with "onene", etc
-        for key in mapping:
-            arg = arg.replace(key, key + key[1:])
-        ds = pattern.findall(arg)
-        n = int(mapping.get(ds[0], ds[0]) + mapping.get(ds[-1], ds[-1]))
-        ns.append(n)
-    return sum(ns)
+    reversed_pattern = re.compile((fr"{word_digits[::-1]}|\d"))
+
+    def first_and_last(s: str):
+        first, last = pattern.search(s).group(0), reversed_pattern.search(s[::-1]).group(0)
+        return int(mapping.get(first, first) + mapping.get(last[::-1], last))
+
+    return sum(first_and_last(arg) for arg in args)
 
 # run both solutions and print outputs + runtime
 def main():

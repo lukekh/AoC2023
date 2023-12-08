@@ -1,0 +1,8 @@
+:: Advent of Code 2023 -- Day 8 ::
+:: Part One ::
+Answer: 16271
+runtime:  0.0032s
+:: Part Two ::
+Answer: 14265111103729
+runtime:  0.0384s
+:: total runtime:  0.0416s ::

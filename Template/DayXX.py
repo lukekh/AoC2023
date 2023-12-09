@@ -7,7 +7,7 @@ from typing import Dict, List, Literal, Set
 day = XX
 
 
-# Parse inputs
+# parse inputs
 with open('DayXX/DayXX.in', encoding="utf8") as f:
     inputs = [i[:-1] for i in f.readlines()]
 

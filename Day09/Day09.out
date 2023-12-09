@@ -1,8 +1,8 @@
 :: Advent of Code 2023 -- Day 9 ::
 :: Part One ::
 Answer: 2105961943
-runtime:  0.0015s
+runtime:  0.0016s
 :: Part Two ::
 Answer: 1019
-runtime:  0.0016s
-:: total runtime:  0.0031s ::
+runtime:  0.0000s
+:: total runtime:  0.0016s ::

@@ -146,12 +146,13 @@ def part_two(positions: List[Position]):
     def determinant(p1: Position, p2: Position):
         """return the determinant as per the shoelace formula"""
         return (p1.col * p2.row) - (p1.row * p2.col)
-    # the inner sum returns a signed area based on the direction of the loop (i.e. using the right hand rule)
-    # it also calculates twice the area 
+    # the inner sum is signed based on the direction of the loop (i.e. using the right hand rule)
+    # it also calculates twice the area so divide by two
     area = abs(
         sum(determinant(pi, pj) for pi, pj in zip(positions, positions[1:] + [positions[0]]))
     ) // 2
     # subtract off the area occupied by the pipes themselves
+    # this is equal to one unit of area per left/right or up/down pair
     girth = len(positions)//2 - 1
     return area - girth
 

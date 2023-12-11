@@ -1,0 +1,8 @@
+:: Advent of Code 2023 -- Day 11 ::
+:: Part One ::
+Answer: 8736819
+runtime:  0.2152s
+:: Part Two ::
+Answer: 827009909817
+runtime:  0.2145s
+:: total runtime:  0.4297s ::

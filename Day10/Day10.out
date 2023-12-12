@@ -1,10 +1,7 @@
-Position(row=52, col=100)
-here
 :: Advent of Code 2023 -- Day 10 ::
 :: Part One ::
 Answer: 6823
-runtime:  0.0182s
+runtime:  0.0224s
 :: Part Two ::
 Answer: 415
-runtime:  0.0017s
-:: total runtime:  0.0200s ::
+runtime:  0.0016s

@@ -1,25 +1,68 @@
 """AoC :: Day 10"""
+from enum import Enum
 from dataclasses import dataclass
 import time
-from typing import Dict, List, Literal, Set
+from typing import Dict, List, Literal
 day = 10
 
 # parse inputs
-PIPES = Literal["|", "-", "L", "J", "7", "F"]
-OTHER = Literal[".", "S"]
-DIRECTION = Literal["UP", "DOWN", "LEFT", "RIGHT"]
+PIPE = Literal["|", "-", "L", "J", "7", "F"]
+class Direction(Enum):
+    """Directions most naturally live on the Gaussian Integers"""
+    UP:    complex = -1j
+    DOWN:  complex = 1j
+    RIGHT: complex = 1 + 0j
+    LEFT:  complex = -1 + 0j
 
-def flip(direction: DIRECTION) -> DIRECTION:
-    """flip a direction"""
-    match direction:
-        case "UP":
-            return "DOWN"
-        case "DOWN":
-            return "UP"
-        case "LEFT":
-            return "RIGHT"
-        case "RIGHT":
-            return "LEFT"
+    def __neg__(self):
+        """flip a direction"""
+        return Direction(-self.value)
+
+@dataclass
+class PipeMovement:
+    """Encode how a pipe affects movement"""
+    exit1: Direction
+    exit2: Direction
+
+    def __call__(self, item: Direction) -> Direction:
+        if -item is self.exit1:
+            return self.exit2
+        if -item is self.exit2:
+            return self.exit1
+        raise KeyError(f"invalid movement {item}, can only accept {-self.exit1} or {-self.exit2} for this pipe")
+
+    def __eq__(self, other: "PipeMovement"):
+        if self.exit1 is other.exit1:
+            if self.exit2 is other.exit2:
+                return True
+        elif self.exit1 is other.exit2:
+            if self.exit2 is other.exit1:
+                return True
+        return False
+
+class Pipe:
+    """The representation of a pipe within the maze"""
+    # How pipes correspond to exits
+    EXITS: Dict[PIPE, PipeMovement] = {
+        "|": PipeMovement(Direction.UP, Direction.DOWN),
+        "L": PipeMovement(Direction.UP, Direction.RIGHT),
+        "J": PipeMovement(Direction.UP, Direction.LEFT),
+        "F": PipeMovement(Direction.DOWN, Direction.RIGHT),
+        "7": PipeMovement(Direction.DOWN, Direction.LEFT),
+        "-": PipeMovement(Direction.RIGHT, Direction.LEFT),
+    }
+
+    def __init__(self, kind: PIPE):
+        self.kind: Pipe = kind
+
+    @property
+    def directions(self) -> PipeMovement:
+        """the directions you can move out from this pipe"""
+        return self.EXITS[self.kind]
+
+    def __call__(self, direction_in: Direction) -> Direction:
+        return self.EXITS[self.kind](direction_in)
+
 
 @dataclass
 class Position:
@@ -27,18 +70,18 @@ class Position:
     row: int
     col: int
 
-    def valid(self) -> Set[DIRECTION]:
-        """return the valid pipes nearby that can be entered from this position"""
-        valid = set()
-        if MAZE.get(self("UP")) and MAZE.get(self("UP")).kind in ("|", "7", "F"):
-            valid.add("UP")
-        if MAZE.get(self("DOWN")) and MAZE.get(self("DOWN")).kind in ("|", "J", "L"):
-            valid.add("DOWN")
-        if MAZE.get(self("RIGHT")) and MAZE.get(self("RIGHT")).kind in ("-", "J", "7"):
-            valid.add("RIGHT")
-        if MAZE.get(self("LEFT")) and MAZE.get(self("LEFT")).kind in ("-", "F", "L"):
-            valid.add("LEFT")
-        return valid
+    def valid(self) -> PipeMovement:
+        """return the directions from this position that will lead to a pipe"""
+        # MAZE.get(self(direction)) returns None if it isn't a pipe
+        valid = []
+        for direction in Direction:
+            try:
+                MAZE[self(direction)](direction)
+                valid.append(direction)
+            except KeyError:
+                pass
+        print(valid)
+        return PipeMovement(exit1=valid[0], exit2=valid[1])
 
     def __eq__(self, other: "Position"):
         return (self.row == other.row) and (self.col == other.col)
@@ -46,59 +89,27 @@ class Position:
     def __hash__(self):
         return hash((self.row, self.col, "Position"))
 
-    def __call__(self, direction: DIRECTION):
-        match direction:
-            case "UP":
-                return Position(self.row - 1, self.col)
-            case "DOWN":
-                return Position(self.row + 1, self.col)
-            case "LEFT":
-                return Position(self.row, self.col - 1)
-            case "RIGHT":
-                return Position(self.row, self.col + 1)
-
-@dataclass
-class Pipe:
-    """The representation of a pipe within the maze"""
-    kind: PIPES
-    position: Position
+    def __call__(self, direction: Direction) -> "Position":
+        gaussian_pos = self.col + self.row * 1j
+        new_pos = gaussian_pos + direction.value
+        return Position(int(new_pos.imag), int(new_pos.real))
 
     @property
-    def directions(self) -> Set[DIRECTION]:
-        """the directions you can move out from this pipe"""
-        match self.kind:
-            case "|":
-                return {"UP", "DOWN"}
-            case "-":
-                return {"LEFT", "RIGHT"}
-            case "L":
-                return {"UP", "RIGHT"}
-            case "J":
-                return {"UP", "LEFT"}
-            case "7":
-                return {"DOWN", "LEFT"}
-            case "F":
-                return {"DOWN", "RIGHT"}
-
-    def __call__(self, in_: DIRECTION) -> DIRECTION:
-        directions = self.directions
-        if (flipped := flip(in_)) in directions:
-            out = (directions ^ {flipped}).pop()
-            return out
-        raise ValueError(f"you cannot travel {in_} into the {self.kind} pipe")
-
+    def pipe(self) -> "Pipe":
+        """Return the pipe from the Maze at this position"""
+        return MAZE[self]
 
 MAZE: Dict[Position, Pipe] = {}
 
 def parse(row: int, string: str):
     """insert pipes into MAZE"""
     start = None
-    for col, char in enumerate(string):
-        if char == "S":
+    for col, character in enumerate(string):
+        if character == "S":
             start = Position(row, col)
-        elif char not in (".", "\n"):
+        elif character not in (".", "\n"):
             pos = Position(row, col)
-            MAZE[pos] = Pipe(char, pos)
+            MAZE[pos] = Pipe(character)
     return start
 
 with open('Day10/Day10.in', encoding="utf8") as f:
@@ -107,11 +118,20 @@ with open('Day10/Day10.in', encoding="utf8") as f:
         if p:
             START = p
 
+# Insert correct pipe into Maze start square
+# This will help to figure out the starting direction and then
+# we only need the position and direction, and we've abstracted
+# the pipe away from movement
 if START:
     v = START.valid()
-    for kind in ["|", "-", "L", "J", "7", "F"]:
-        if Pipe(kind, START).directions == v:
-            MAZE[START] = Pipe(kind, START)
+    print(f"v = {v}")
+    for char in ["|", "-", "L", "J", "7", "F"]:
+        if Pipe(char).directions == v:
+            print(f"starting pipe char: {char}")
+            print()
+            MAZE[START] = Pipe(char)
+else:
+    raise ValueError("There is no starting tile 'S' in the maze provided")
 
 # part one
 def part_one(start: Position):
@@ -120,17 +140,20 @@ def part_one(start: Position):
     
     return the positions the loop takes in the maze for part two
     """
-    d = start.valid().pop()
-    loop_positions: List[DIRECTION] = [start(d)]
-    # step into maze
-    ahead = MAZE[start(d)]
-    i = 1
-    while ahead.position != start:
-        d = ahead(d)
-        loop_positions.append(ahead.position(d))
-        ahead = MAZE[ahead.position(d)]
-        i += 1
-    return i//2, loop_positions
+    # Init counter, position and direction
+    position = start
+    direction = position.pipe.directions.exit1
+    # store all the loop positions
+    loop_positions: List[Position] = []
+    # Walk around maze until we're back where we started
+    while True:
+        # Update position and direction
+        position = position(direction)
+        direction = position.pipe(direction)
+        loop_positions.append(position)
+        if position == start:
+            break
+    return len(loop_positions)//2, loop_positions
 
 # part two
 def part_two(positions: List[Position]):

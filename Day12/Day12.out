@@ -1,0 +1,8 @@
+:: Advent of Code 2023 -- Day 12 ::
+:: Part One ::
+Answer: 6981
+runtime:  0.0143s
+:: Part Two ::
+Answer: 4546215031609
+runtime:  0.2254s
+:: total runtime:  0.2397s ::

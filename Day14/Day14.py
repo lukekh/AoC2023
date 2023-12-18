@@ -22,6 +22,11 @@ with open('Day14/Day14.in', encoding="utf8") as f:
             if char in ("#", "O"):
                 GRID.setdefault(c, []).append(Rock(char, r, c))
 
+# HELPER FUNCTION
+def hash_grid(grid: dict[int, list[Rock]]):
+    """helper function to hash grid"""
+    return '\n'.join([''.join(rock.kind for rock in rocks) for _, rocks in grid.items()])
+
 # part one
 def part_one(grid: dict[int, list[Rock]]):
     """Solution to part one"""
@@ -29,29 +34,54 @@ def part_one(grid: dict[int, list[Rock]]):
     total = 0
     for col, rocks in grid.items():
         load = N
-        for rock in rocks:
+        for rock in sorted(rocks, key=lambda x: x.row):
             match rock.kind:
                 case "#":
-                    new_grid.setdefault(col, []).append(Rock("O", col, N - rock.row))
-                    load = N - rock.row - 1
+                    load = N - rock.row
+                    new_grid.setdefault(load-1, []).append(Rock("#", col, load-1))
+                    load -= 1
                 case "O":
                     total += load
-                    new_grid.setdefault(col, []).append(Rock("O", col, load))
+                    new_grid.setdefault(load-1, []).append(Rock("O", col, load-1))
                     load -= 1
     return total, new_grid
 
 # part two
+def load_no_slide(grid: dict[int, list[Rock]]):
+    """Do part one without sliding"""
+    total = 0
+    for _, rocks in grid.items():
+        for rock in rocks:
+            match rock.kind:
+                case "#":
+                    pass
+                case "O":
+                    total += N - rock.row
+    return total
+
 def part_two(grid: dict[int, list[Rock]], n: int = 1_000_000_000):
     """Solution to part two"""
     def cycle(grid: dict[int, list[Rock]]):
         for _ in range(4):
-            total, grid = part_one(grid)
-        return total, grid
+            _, grid = part_one(grid)
+        return _, grid
 
-    for i in range(2):
-        total, grid = cycle(grid)
-        print(f"cycle {i}: {total}")
-    return 1
+    cache = {}
+    i = 0
+    cycle_detected = False
+    while i < n:
+        _, grid = cycle(grid)
+        if not cycle_detected:
+            s = hash_grid(grid)
+            if (s not in cache) and (not cycle_detected):
+                cache[s] = i
+            elif (s in cache) and (not cycle_detected):
+                cycle_length = i - cache[s]
+                m = (n - i)//cycle_length
+                i += m * cycle_length
+                cycle_detected = True
+        i += 1
+    return load_no_slide(grid)
 
 # run both solutions and print outputs + runtime
 def main():

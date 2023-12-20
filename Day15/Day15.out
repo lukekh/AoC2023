@@ -1,0 +1,8 @@
+:: Advent of Code 2023 -- Day 15 ::
+:: Part One ::
+Answer: 503487
+runtime:  0.0017s
+:: Part Two ::
+Answer: 261505
+runtime:  0.0018s
+:: total runtime:  0.0035s ::

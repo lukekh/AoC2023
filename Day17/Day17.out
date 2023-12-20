@@ -1,0 +1,8 @@
+:: Advent of Code 2023 -- Day 17 ::
+:: Part One ::
+Answer: 817
+runtime:  1.1798s
+:: Part Two ::
+Answer: 925
+runtime:  4.0496s
+:: total runtime:  5.2294s ::

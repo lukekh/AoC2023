@@ -1,0 +1,8 @@
+:: Advent of Code 2023 -- Day 16 ::
+:: Part One ::
+Answer: 7236
+runtime:  0.0081s
+:: Part Two ::
+Answer: 7521
+runtime:  1.8555s
+:: total runtime:  1.8636s ::

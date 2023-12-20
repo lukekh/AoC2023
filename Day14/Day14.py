@@ -4,7 +4,6 @@ import time
 from typing import Literal
 day = 14
 
-
 # parse inputs
 @dataclass
 class Rock:

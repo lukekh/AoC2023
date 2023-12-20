@@ -1,0 +1,8 @@
+:: Advent of Code 2023 -- Day 14 ::
+:: Part One ::
+Answer: 103614
+runtime:  0.0012s
+:: Part Two ::
+Answer: 83790
+runtime:  0.9772s
+:: total runtime:  0.9784s ::

@@ -1,0 +1,8 @@
+:: Advent of Code 2023 -- Day 18 ::
+:: Part One ::
+Answer: 47045
+runtime:  0.0004s
+:: Part Two ::
+Answer: 147839570293376
+runtime:  0.0006s
+:: total runtime:  0.0010s ::

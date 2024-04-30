@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 import math
 import re
 import time
-from typing import Any, Literal, Optional
+from typing import Literal, Optional
 day = 20
 
 @dataclass
@@ -83,7 +83,6 @@ class AbstractModule:
             memory = self.memory | other.memory
         )
 
-
 class Modules:
     """A collection of modules"""
     def __init__(self):
@@ -137,6 +136,42 @@ class Modules:
             if (response := self[recipient](pulse)) is not None:
                 self.pulses.append(response)
 
+    def part_two(self, tracking: list[str]):
+        """resolve the pulse that has been in the queue for longest"""
+        # track low pulses of & modules
+        ctr = 0
+        tracking = ["rd", "bt", "fv", "pr"]
+        last = {m: 0 for m in tracking}
+        cycles = {m: -1 for m in tracking}
+        resolved = {m: False for m in tracking}
+
+        while True:
+            try:
+                pulse = self.pulses.popleft()
+
+                if (pulse.strength) and (pulse.from_ in tracking):
+                    # Check if cycle detected
+                    if cycles[pulse.from_] == ctr - last[pulse.from_]:
+                        resolved[pulse.from_] = True
+                        # Exit if resolved
+                        if all(resolved.values()):
+                            return math.lcm(*cycles.values())
+                    else:
+                        resolved[pulse.from_] = False
+
+                    # Update tracking vals
+                    cycles[pulse.from_] = ctr - last[pulse.from_]
+                    last[pulse.from_] = ctr
+
+                # calculate effects
+                for recipient in pulse.affects:
+                    if (response := self[recipient](pulse)) is not None:
+                        self.pulses.append(response)
+            except IndexError:
+                ctr += 1
+                self.button()
+
+
     def button(self):
         """push the button"""
         self.pulses.append(Pulse(
@@ -144,7 +179,28 @@ class Modules:
             from_="button",
             affects=["broadcaster"]
         ))
-        
+
+    def md(self):
+        """generate a mermaid diagram starting with the broadcaster"""
+        ms = [self.broadcaster]
+        resolved = set()
+
+        arrows = ""
+        while ms:
+            new_ms = []
+            for m in ms:
+                if m.kind and m.id not in resolved:
+                    arrows += "\n".join(f"    {m.id}[{m.kind}{m.id}] --> {c}" for c in m.children) + "\n"
+                    new_ms.extend(self[c] for c in m.children if c not in resolved)
+                resolved.add(m.id)
+            ms = new_ms
+
+        return (
+            "```mermaid\n"
+            "graph LR\n"
+            f"{arrows}"
+            "```"
+        ).replace("broadcasterbroadcaster", "broadcaster")
 
 MODULES = Modules()
 
@@ -188,33 +244,11 @@ def part_one(modules: Modules, n: int = 1000):
                 break
     return modules.lows * modules.highs
 
-# part two
-make_bin = lambda l: bin(sum(2**i for i, j in enumerate(l) if j))[2:].zfill(8)
 def part_two(modules: Modules):
     """Solution to part two"""
-    press_ctr = 0
-    ids = {"xz", "jn", "rb", "hh", "rq", "bg", "ts", "jl"}
-    mem = {id_: None for id_ in ids}
-    last = {id_: 0 for id_ in ids}
-    cycle = {id_: 0 for id_ in ids}
-    while ids:
-        try:
-            modules.resolve()
-        except IndexError:
-            press_ctr += 1
-            modules.button()
-            for id_ in ids.copy():
-                if mem[id_] != modules[id_].state:
-                    if cycle[id_] == press_ctr - last[id_]:
-                        ids.remove(id_)
-                        print(cycle)
-                    else:
-                        cycle[id_] = press_ctr - last[id_]
-                        last[id_] = press_ctr
-                mem[id_] = modules[id_].state
-    print(cycle)
-
-    return press_ctr
+    TERMINUS = "rx"
+    tracking = [t for p in modules[TERMINUS].parents for t in modules[p].parents]
+    return modules.part_two(tracking)
 
 # run both solutions and print outputs + runtime
 def main():
@@ -232,7 +266,7 @@ def main():
     # Part Two
     print(":: Part Two ::")
     t2 = -time.time()
-    a2 = 2 # part_two(MODULES)
+    a2 = part_two(MODULES)
     t2 += time.time()
     print(f"Answer: {a2}")
     print(f"runtime: {t2: .4f}s")

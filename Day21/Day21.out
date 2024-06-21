@@ -1,0 +1,8 @@
+:: Advent of Code 2023 -- Day 21 ::
+:: Part One ::
+Answer: 3651
+runtime:  0.0208s
+:: Part Two ::
+Answer: 607334325965751
+runtime:  0.0023s
+:: total runtime:  0.0231s ::

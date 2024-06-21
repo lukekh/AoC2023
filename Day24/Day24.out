@@ -1,0 +1,8 @@
+:: Advent of Code 2023 -- Day 24 ::
+:: Part One ::
+Answer: 15318
+runtime:  0.3387s
+:: Part Two ::
+Answer: 870379016024859
+runtime:  1.1919s
+:: total runtime:  1.2780s ::

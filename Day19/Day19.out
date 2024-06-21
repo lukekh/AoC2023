@@ -1,0 +1,8 @@
+:: Advent of Code 2023 -- Day 19 ::
+:: Part One ::
+Answer: 432427
+runtime:  0.0008s
+:: Part Two ::
+Answer: 143760172569135
+runtime:  0.0025s
+:: total runtime:  0.0033s ::

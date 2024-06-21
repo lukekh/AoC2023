@@ -1,0 +1,8 @@
+:: Advent of Code 2023 -- Day 22 ::
+:: Part One ::
+Answer: 393
+runtime:  0.0048s
+:: Part Two ::
+Answer: 58440
+runtime:  0.3106s
+:: total runtime:  0.3155s ::

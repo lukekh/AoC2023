@@ -1,0 +1,8 @@
+:: Advent of Code 2023 -- Day 20 ::
+:: Part One ::
+Answer: 788848550
+runtime:  0.0260s
+:: Part Two ::
+Answer: 228300182686739
+runtime:  0.2191s
+:: total runtime:  0.2451s ::
